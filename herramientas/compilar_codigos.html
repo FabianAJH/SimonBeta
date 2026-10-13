@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Encriptador de Códigos — Simón: Tu Amigo Virtual</title>
+  <!-- 1. Carga automática de tu archivo privado -->
+  <script src="codigos_privados.js"></script>
+  <style>
+    body {
+      background: #0f1230;
+      color: #e8ecff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+    .card {
+      background: #1b204e;
+      border: 2px solid #3d4a8d;
+      border-radius: 12px;
+      max-width: 860px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    h1 {
+      margin-top: 0;
+      color: #ffd84a;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    p {
+      color: #aab4ff;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .badge {
+      background: #2a3475;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #79ffe1;
+      font-family: monospace;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 12px;
+    }
+    th, td {
+      border: 1px solid #343f7c;
+      padding: 9px 10px;
+      text-align: left;
+    }
+    th {
+      background: #252d6a;
+      color: #ffd84a;
+    }
+    tr:nth-child(even) {
+      background: #171b42;
+    }
+    .btn {
+      background: #39cf7c;
+      color: #0b2e17;
+      font-weight: bold;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn:hover {
+      background: #4ae08d;
+      transform: translateY(-1px);
+    }
+    .btn-sec {
+      background: #343f7c;
+      color: #e8ecff;
+    }
+    .btn-sec:hover {
+      background: #414f9c;
+    }
+    .box {
+      background: #121535;
+      border: 1px solid #2e376e;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+    }
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      background: #0b0e27;
+      border: 1px solid #3a478c;
+      color: #fff;
+      padding: 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .status {
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      margin-top: 14px;
+      display: none;
+    }
+    .status.ok {
+      display: block;
+      background: #113824;
+      color: #79ffe1;
+      border: 1px solid #287a4a;
+    }
+    .status.info {
+      display: block;
+      background: #192556;
+      color: #aab4ff;
+      border: 1px solid #3d4a8d;
+    }
+    code {
+      background: #090c23;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #ffd84a;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h1>🔒 Encriptador de Códigos de Simón</h1>
+  <p>
+    Esta herramienta lee automáticamente tu archivo <code>codigos_privados.js</code>, calcula los hashes matemáticos secretos y genera el archivo <code>codigos.js</code> protegido para tu juego.<br>
+    <b>Cada vez que cambies un código en <code>codigos_privados.js</code></b>, solo abre (o recarga) esta página y pulsa el botón verde.
+  </p>
+
+  <div id="origen-info" class="status info" style="display:block;margin-bottom:14px;">
+    <!-- Estado de carga del archivo privado -->
+  </div>
+
+  <div class="box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap;">
+      <h3 style="margin:0;color:#ffd84a;font-size:15px;">Códigos Cargados (en texto plano)</h3>
+      <div style="display:flex;gap:8px;">
+        <input type="file" id="input-archivo" accept=".js" style="display:none" onchange="subirArchivoPrivado(event)">
+        <button class="btn btn-sec" style="font-size:12px;padding:8px 14px;" onclick="document.getElementById('input-archivo').click()">📂 Cargar otro codigos_privados.js</button>
+        <button class="btn" onclick="generarYDescargar()">⚡ GENERAR Y DESCARGAR codigos.js</button>
+      </div>
+    </div>
+
+    <table id="tabla-codigos">
+      <thead>
+        <tr>
+          <th>Palabra Clave</th>
+          <th>Tipo</th>
+          <th>Hash Encriptado</th>
+          <th>Recompensa / Descripción</th>
+        </tr>
+      </thead>
+      <tbody id="cuerpo-tabla">
+        <!-- Render dinámico -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="box">
+    <h3 style="margin-top:0;color:#ffd84a;font-size:14px;">➕ Probar o Añadir un Código Rápidamente</h3>
+    <div style="display:grid;grid-template-columns: 1fr 1fr;gap:12px;">
+      <div>
+        <label style="font-size:11px;color:#aab4ff;">Palabra del Código:</label>
+        <input type="text" id="nuevo-palabra" placeholder="Ej: COLORES o SUPERORO" oninput="calcularHashPreview()">
+      </div>
+      <div>
+        <label style="font-size:11px;color:#aab4ff;">Hash Criptográfico (lo único que verá el jugador):</label>
+        <input type="text" id="nuevo-hash" readonly style="color:#79ffe1;" placeholder="Se calcula automáticamente...">
+      </div>
+    </div>
+    <div>
+      <label style="font-size:11px;color:#aab4ff;">Mensaje de Recompensa (ej: +500 monedas):</label>
+      <input type="text" id="nuevo-premio" placeholder="Ej: ¡+500 MONEDAS EXTRAS!">
+    </div>
+    <button class="btn btn-sec" onclick="agregarCodigo()">Añadir a la Lista Actual</button>
+  </div>
+
+  <div id="status" class="status"></div>
+</div>
+
+<script>
+// Hash FNV-1a con sal
+function suma(t) {
+  let h = 2166136261;
+  for (let i = 0; i < t.length; i++) {
+    h ^= t.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(16);
+}
+
+const normCod = t => (t || "")
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .toUpperCase()
+  .replace(/[^A-Z0-9]/g, "");
+
+const hCod = t => suma("simon|" + normCod(t));
+
+// Fallback por defecto si codigos_privados.js no estuviera en la misma carpeta
+const CODIGOS_DEFAULT = [
+  {
+    codigo: "ARCOIRIS",
+    alias: ["SUDADERAARCOIRIS", "SUDADERA"],
+    tipo: "prenda",
+    descripcion: "Sudadera Arcoíris (equipada de inmediato)",
+    unSoloUso: true,
+    accion: (e) => { e.tiene.sud_arcoiris = 1; e.ropa.sudadera = 'sud_arcoiris'; return '¡SUDADERA ARCOÍRIS! Es única y ya la tienes puesta.'; }
+  },
+  {
+    codigo: "NEON",
+    alias: ["NEONSIMON", "LUZNEON"],
+    tipo: "deco",
+    descripcion: "Neón Simón en la pared",
+    unSoloUso: true,
+    accion: (e) => { e.tiene.neon_si = 1; if (typeof colocar === 'function') colocar('neon_si'); return '¡NEÓN SIMON! Ya brilla en tu habitación.'; }
+  },
+  {
+    codigo: "ESTRELLAS",
+    alias: ["OBRAESTRELLAS", "CUADROESTRELLAS"],
+    tipo: "obra",
+    descripcion: "Cuadro Obra Estrellas",
+    unSoloUso: true,
+    accion: (e) => { e.tiene.marco_estrellas = 1; if (e.cuarto) e.cuarto.cuadro = 'marco_estrellas'; return '¡OBRA ESTRELLAS! Ya cuelga de tu pared.'; }
+  },
+  {
+    codigo: "TESORO",
+    alias: ["MONEDAS", "MONEDAS100", "100MONEDAS"],
+    tipo: "monedas",
+    descripcion: "+100 Monedas",
+    unSoloUso: true,
+    accion: (e) => { e.monedas = (e.monedas || 0) + 100; e.total = (e.total || 0) + 100; return '¡+100 MONEDAS!'; }
+  },
+  {
+    codigo: "TIEMPOSIMON",
+    alias: ["TIEMPO", "HORAS", "HORASJUGADAS"],
+    tipo: "info",
+    descripcion: "Consulta de horas jugadas",
+    unSoloUso: false,
+    accion: (e) => { const m = Math.floor(((e && e.tJ) || 0) / 60); return 'TIEMPO JUGADO: ' + Math.floor(m / 60) + ' H ' + (m % 60) + ' MIN'; }
+  },
+  {
+    codigo: "SXADMIN-4R7K-M2Q9-ZT58",
+    alias: ["ADMIN", "MODOADMIN", "CORTEXADMIN", "PANEL"],
+    tipo: "admin",
+    descripcion: "Modo Administrador Secreto de Cortex",
+    unSoloUso: false,
+    accion: (e) => { if (typeof admin !== 'undefined' && admin) { return { ok: true, t: 'YA ESTÁS EN MODO ADMIN' }; } if (typeof activarAdmin === 'function') activarAdmin(); return { ok: true, t: null }; }
+  },
+  {
+    codigo: "SIMON-RESET-9Z4K-QX72-WIPE-3B8M",
+    alias: [],
+    tipo: "reinicio",
+    descripcion: "Pide confirmación para borrar todo el progreso",
+    unSoloUso: false,
+    accion: (e) => { if (typeof resetPend !== 'undefined') resetPend = true; if (typeof window !== 'undefined') window.resetPend = true; return { ok: true, t: null, tipo: 'reinicio' }; }
+  }
+];
+
+// Comprobar si se cargó desde codigos_privados.js
+let codigos = [];
+let origenTexto = "";
+
+if (typeof window.MIS_CODIGOS !== "undefined" && Array.isArray(window.MIS_CODIGOS) && window.MIS_CODIGOS.length) {
+  codigos = window.MIS_CODIGOS;
+  origenTexto = "✓ Leído automáticamente desde <b>codigos_privados.js</b> (" + codigos.length + " códigos cargados en vivo). Si cambias palabras en ese archivo, solo recarga esta página (F5) para verlas actualizadas.";
+} else {
+  codigos = CODIGOS_DEFAULT;
+  origenTexto = "ℹ Usando lista predeterminada (" + codigos.length + " códigos). Si editaste <code>codigos_privados.js</code>, asegúrate de tener ambos archivos en la misma carpeta o pulsa <b>📂 Cargar otro codigos_privados.js</b>.";
+}
+
+document.getElementById("origen-info").innerHTML = origenTexto;
+
+function renderTabla() {
+  const tb = document.getElementById("cuerpo-tabla");
+  tb.innerHTML = codigos.map((c, i) => {
+    const h = hCod(c.codigo);
+    const aliasTxt = (c.alias && c.alias.length) ? ("<br><span style='color:#7f8cc9;font-size:10px;'>Alias: " + c.alias.join(", ") + "</span>") : "";
+    return "<tr>" +
+      "<td><b>" + c.codigo + "</b>" + aliasTxt + "</td>" +
+      "<td><span class='badge'>" + (c.tipo || "item") + "</span></td>" +
+      "<td style='font-family:monospace;color:#79ffe1;'>" + h + "</td>" +
+      "<td>" + (c.descripcion || c.desc || "Recompensa") + "</td>" +
+    "</tr>";
+  }).join("");
+}
+
+function calcularHashPreview() {
+  const val = document.getElementById("nuevo-palabra").value;
+  document.getElementById("nuevo-hash").value = val ? hCod(val) : "";
+}
+
+function agregarCodigo() {
+  const pal = document.getElementById("nuevo-palabra").value.trim();
+  const prem = document.getElementById("nuevo-premio").value.trim();
+  if (!pal) { alert("Escribe una palabra para el código."); return; }
+
+  const codNorm = normCod(pal);
+  const premioSafe = prem ? prem.replace(/['"\\]/g, "") : ("Premio " + codNorm);
+
+  codigos.push({
+    codigo: codNorm,
+    alias: [],
+    tipo: "recompensa",
+    descripcion: premioSafe,
+    unSoloUso: true,
+    accion: new Function("e", "e.monedas = (e.monedas || 0) + 100; return '¡CÓDIGO CANJEADO: " + premioSafe + "!';")
+  });
+
+  document.getElementById("nuevo-palabra").value = "";
+  document.getElementById("nuevo-hash").value = "";
+  document.getElementById("nuevo-premio").value = "";
+  renderTabla();
+
+  const st = document.getElementById("status");
+  st.className = "status ok";
+  st.innerHTML = "✓ Código <b>" + codNorm + "</b> añadido a la lista. Ahora pulsa <b>GENERAR Y DESCARGAR codigos.js</b>.";
+}
+
+// Cargar archivo personalizado si el usuario lo selecciona con el botón
+function subirArchivoPrivado(ev) {
+  const file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const contenido = e.target.result;
+      const fn = new Function("window", contenido + "\nreturn (typeof MIS_CODIGOS !== 'undefined' ? MIS_CODIGOS : (window.MIS_CODIGOS || []));");
+      const res = fn({});
+      if (Array.isArray(res) && res.length) {
+        codigos = res;
+        document.getElementById("origen-info").innerHTML = "✓ Archivo <b>" + file.name + "</b> cargado exitosamente (" + codigos.length + " códigos).";
+        renderTabla();
+        alert("¡Archivo cargado! Se encontraron " + codigos.length + " códigos.");
+      } else {
+        alert("No se encontró el arreglo MIS_CODIGOS en el archivo seleccionado.");
+      }
+    } catch(err) {
+      alert("Error al leer el archivo: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+const TEMPLATE_BEFORE = "/* ==========================================================================\n * SISTEMA Y DEFINICI\u00d3N DE C\u00d3DIGOS (COMPILADO / ENCRIPTADO) \u2014 SIMON\n * ==========================================================================\n * Archivo generado autom\u00e1ticamente por compilar_codigos.js.\n * \u00a1NO EDITES DIRECTAMENTE ESTE ARCHIVO!\n *\n * Para editar o agregar c\u00f3digos:\n *  1. Modifica 'codigos_privados.js' (donde est\u00e1n en texto plano).\n *  2. Ejecuta 'node compilar_codigos.js' (o usa compilar_codigos.html).\n * ========================================================================== */\n\nfunction suma(t) {\n  let h = 2166136261;\n  for (let i = 0; i < t.length; i++) {\n    h ^= t.charCodeAt(i);\n    h = Math.imul(h, 16777619);\n  }\n  return (h >>> 0).toString(16);\n}\n\nconst normCod = t => (t || '')\n  .normalize('NFD')\n  .replace(/[\\u0300-\\u036f]/g, '')\n  .toUpperCase()\n  .replace(/[^A-Z0-9]/g, '');\n\nconst hCod = t => suma('simon|' + normCod(t));\n\nasync function esReset(v) {\n  try {\n    const c = buscarCodigo(normCod(v), hCod(v));\n    return !!(c && c.tipo === 'reinicio');\n  } catch (_) {\n    return false;\n  }\n}\n\nfunction reiniciarTodo() {\n  if (typeof reseteando !== 'undefined') reseteando = true;\n  try { localStorage.removeItem(typeof CLAVE !== 'undefined' ? CLAVE : 'simon-v1'); } catch (_) {}\n  try { localStorage.removeItem(typeof CLAVE_BK !== 'undefined' ? CLAVE_BK : 'simon-v1-bk'); } catch (_) {}\n  if (typeof idbClear === 'function') idbClear();\n  try {\n    if (typeof window !== 'undefined' && window.caches) {\n      caches.keys().then(ks => ks.forEach(k => {\n        if (!k.startsWith('simon-')) caches.delete(k);\n      }));\n    }\n  } catch (_) {}\n  setTimeout(() => location.reload(), 150);\n}\n\nconst LISTA_CODIGOS = [";
+const TEMPLATE_AFTER = "];\n\nconst CODIGOS = {};\nfunction sincronizarDiccionarioCodigos() {\n  LISTA_CODIGOS.forEach(c => {\n    const wrap = { n: c.tipo, f: () => c.accion(e), def: c };\n    if (c.hash) CODIGOS[c.hash] = wrap;\n    if (c.aliasHashes) c.aliasHashes.forEach(h => { CODIGOS[h] = wrap; });\n    if (c.codigo) CODIGOS[normCod(c.codigo)] = wrap;\n  });\n}\nsincronizarDiccionarioCodigos();\n\nvar cdMsg = null;\nif (typeof resetPend === 'undefined') {\n  window.resetPend = false;\n}\n\nfunction buscarCodigo(limpio, h) {\n  for (const c of LISTA_CODIGOS) {\n    if (c.hash && (c.hash === h || c.hash === limpio.toLowerCase())) return c;\n    if (c.aliasHashes && c.aliasHashes.includes(h)) return c;\n    if (c.codigo && (normCod(c.codigo) === limpio || hCod(c.codigo) === h)) return c;\n  }\n  return null;\n}\n\nfunction canjearCodigo(v) {\n  const limpio = normCod(v);\n  const h = hCod(v);\n\n  if (!limpio) return { ok: false, t: 'ESCRIBE UN C\u00d3DIGO' };\n\n  // 1. Buscar en la lista compilada (\u00a1\u00daNICA fuente de la verdad!)\n  const c = buscarCodigo(limpio, h);\n  if (!c) return { ok: false, t: 'C\u00d3DIGO NO V\u00c1LIDO' };\n\n  // 2. Si es c\u00f3digo de administrador\n  if (c.tipo === 'admin') {\n    if (typeof admin !== 'undefined' && admin) {\n      return { ok: true, t: 'YA EST\u00c1S EN MODO ADMIN', tipo: 'admin' };\n    }\n    if (typeof activarAdmin === 'function') activarAdmin();\n    return { ok: true, t: null, tipo: 'admin' };\n  }\n\n  // 3. Si es c\u00f3digo de reinicio total\n  if (c.tipo === 'reinicio') {\n    return { ok: true, t: null, tipo: 'reinicio' };\n  }\n\n  // 4. Si es c\u00f3digo de informaci\u00f3n (tiempo jugado, etc.)\n  if (c.tipo === 'info') {\n    const resInfo = typeof c.accion === 'function' ? c.accion(e) : 'INFO';\n    return { ok: true, t: typeof resInfo === 'string' ? resInfo : (resInfo && resInfo.t ? resInfo.t : 'INFO'), tipo: 'info' };\n  }\n\n  // 5. C\u00f3digos de un solo uso\n  if (c.unSoloUso !== false && e && e.cod) {\n    if ((c.hash && e.cod[c.hash]) || e.cod[h] || (c.codigo && e.cod[c.codigo])) {\n      return { ok: false, t: 'YA USASTE ESTE C\u00d3DIGO' };\n    }\n  }\n\n  if (c.unSoloUso !== false && e) {\n    if (!e.cod) e.cod = {};\n    if (c.hash) e.cod[c.hash] = 1;\n    if (c.codigo) e.cod[c.codigo] = 1;\n    e.cod[h] = 1;\n  }\n\n  const res = typeof c.accion === 'function' ? c.accion(e) : (typeof c.f === 'function' ? c.f() : '\u00a1C\u00d3DIGO CANJEADO!');\n  let msg = '\u00a1C\u00d3DIGO CANJEADO!';\n  if (typeof res === 'string') msg = res;\n  else if (res && typeof res.t === 'string') msg = res.t;\n\n  if (typeof guardar === 'function') guardar();\n  if (typeof pintar === 'function') pintar();\n\n  return { ok: true, t: msg, tipo: c.tipo, hash: c.hash || h };\n}\n\nfunction canjear() {\n  const inp = (typeof $ === 'function') ? $('cd-in') : (typeof document !== 'undefined' ? document.getElementById('cd-in') : null);\n  const v = inp ? inp.value : '';\n  const limpio = normCod(v);\n  const h = hCod(v);\n\n  const fnRender = (typeof window !== 'undefined' && typeof window.render === 'function') ? window.render : (typeof render === 'function' ? render : null);\n  const fnSfx = (typeof window !== 'undefined' && window.sfx) ? window.sfx : (typeof sfx !== 'undefined' ? sfx : null);\n\n  if (!limpio) {\n    cdMsg = { ok: false, t: 'ESCRIBE UN C\u00d3DIGO' };\n    if (fnSfx && fnSfx.no) fnSfx.no();\n    if (fnRender) fnRender();\n    return;\n  }\n\n  const c = buscarCodigo(limpio, h);\n  if (!c) {\n    cdMsg = { ok: false, t: 'C\u00d3DIGO NO V\u00c1LIDO' };\n    if (fnSfx && fnSfx.no) fnSfx.no();\n    if (fnRender) fnRender();\n    return;\n  }\n\n  if (c.tipo === 'reinicio') {\n    if (typeof resetPend !== 'undefined') resetPend = true;\n    if (typeof window !== 'undefined') window.resetPend = true;\n    if (fnSfx && fnSfx.no) fnSfx.no();\n    if (fnRender) fnRender();\n    return;\n  }\n\n  ejecutarCanjeNormal(v, h);\n}\n\nfunction ejecutarCanjeNormal(v, h) {\n  const res = canjearCodigo(v);\n  const fnRender = (typeof window !== 'undefined' && typeof window.render === 'function') ? window.render : (typeof render === 'function' ? render : null);\n  const fnSfx = (typeof window !== 'undefined' && window.sfx) ? window.sfx : (typeof sfx !== 'undefined' ? sfx : null);\n  const fnEstrellas = (typeof window !== 'undefined' && typeof window.estrellas === 'function') ? window.estrellas : (typeof estrellas === 'function' ? estrellas : null);\n\n  if (res.ok) {\n    if (res.tipo === 'reinicio') {\n      if (typeof resetPend !== 'undefined') resetPend = true;\n      if (typeof window !== 'undefined') window.resetPend = true;\n      if (fnSfx && fnSfx.no) fnSfx.no();\n      if (fnRender) fnRender();\n      return;\n    }\n    cdMsg = res.t ? { ok: true, t: res.t } : null;\n    if (res.tipo !== 'admin') {\n      if (fnSfx && fnSfx.logro) fnSfx.logro();\n      if (fnEstrellas) fnEstrellas(6);\n    }\n  } else {\n    cdMsg = { ok: false, t: res.t };\n    if (fnSfx && fnSfx.no) fnSfx.no();\n  }\n  if (fnRender) fnRender();\n}\n\nfunction renderCod(soloEntrada) {\n  if (typeof resetPend !== 'undefined' && resetPend) {\n    return '<div class=\"centro\" style=\"font-size:9px;line-height:2;margin:10px 0;color:#ff8a92\">\u00a1ADVERTENCIA!<br><br>Vas a BORRAR TODO tu progreso: monedas, cari\u00f1o, ropa, muebles, logros y diario.<br><br>Simon empezar\u00e1 desde cero y NO se puede deshacer.</div>' +\n      '<button class=\"bt gran\" style=\"background:#ff7b84\" data-a=\"c_reset_ok\">S\u00cd, BORRAR TODO</button><button class=\"bt ok gran\" data-a=\"c_reset_no\">CANCELAR</button>';\n  }\n  var pad = soloEntrada ? 14 : 4;\n  var subtit = soloEntrada ? 'C\u00d3DIGOS NORMALES' : 'Escribe un c\u00f3digo y gana premios.';\n  var msgHtml = (typeof cdMsg !== 'undefined' && cdMsg)\n    ? '<div class=\"centro\" style=\"font-size:8px;line-height:1.9;margin-top:6px;color:' + (cdMsg.ok ? '#bff0c8' : '#ff8a92') + '\">' + cdMsg.t + '</div>'\n    : '';\n  return '<div class=\"centro\" style=\"font-size:8px;line-height:1.9;margin:' + pad + 'px 0 10px\">' + subtit + '</div>' +\n    '<input class=\"cod\" id=\"cd-in\" maxlength=\"40\" autocomplete=\"off\" autocapitalize=\"characters\" spellcheck=\"false\" placeholder=\"ESCRIBE TU C\u00d3DIGO\">' +\n    '<button class=\"bt ok gran\" data-a=\"c_canjear\">CANJEAR</button>' +\n    msgHtml;\n}\n\nif (typeof window !== 'undefined') {\n  window.suma = suma;\n  window.normCod = normCod;\n  window.hCod = hCod;\n  window.esReset = esReset;\n  window.reiniciarTodo = reiniciarTodo;\n  window.LISTA_CODIGOS = LISTA_CODIGOS;\n  window.CODIGOS = CODIGOS;\n  window.sincronizarDiccionarioCodigos = sincronizarDiccionarioCodigos;\n  window.cdMsg = cdMsg;\n  window.resetPend = resetPend;\n  window.buscarCodigo = buscarCodigo;\n  window.canjearCodigo = canjearCodigo;\n  window.canjear = canjear;\n  window.renderCod = renderCod;\n}\n";
+
+function generarYDescargar() {
+  const items = codigos.map(c => {
+    const hashPrinc = hCod(c.codigo);
+    const aliasHashes = (c.alias || []).map(a => hCod(a));
+    const fnStr = (typeof c.accion === "function") ? c.accion.toString() : (c.accionCode || "() => '¡OK!'");
+    return "  {\n" +
+      "    hash: '" + hashPrinc + "',\n" +
+      "    aliasHashes: " + JSON.stringify(aliasHashes) + ",\n" +
+      "    tipo: '" + (c.tipo || "item") + "',\n" +
+      "    unSoloUso: " + (c.unSoloUso !== false) + ",\n" +
+      "    accion: " + fnStr + "\n" +
+      "  }";
+  }).join(",\n\n");
+
+  const contenidoFinal = TEMPLATE_BEFORE + "\n" + items + "\n" + TEMPLATE_AFTER;
+
+  const blob = new Blob([contenidoFinal], { type: "application/javascript;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "codigos.js";
+  a.click();
+
+  const st = document.getElementById("status");
+  st.className = "status ok";
+  st.innerHTML = "✓ ¡Archivo <b>codigos.js</b> generado y descargado con " + codigos.length + " códigos! Reemplázalo en la carpeta <b>js/economia/</b> de tu juego.";
+}
+
+renderTabla();
+</script>
+
+</body>
+</html>

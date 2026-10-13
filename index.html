@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#141a3c">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Simon: Tu Amigo Virtual</title>
+<meta name="application-name" content="Simon">
+<meta name="apple-mobile-web-app-title" content="Simon">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="gb">
+  <header class="hud">
+    <div class="fila-top">
+      <div class="izq">
+        <canvas id="logo" width="22" height="12" style="display:none"></canvas>
+        <div class="chip" id="chip-fue" style="display:none"><canvas id="ic-fue" width="9" height="11"></canvas><span id="v-fue">0</span></div>
+        <div class="med" id="chip-niv"><div class="medi"><canvas id="ic-cor" width="9" height="8"></canvas></div><span class="mtag" id="v-niv">NV1</span></div>
+        <div class="stats" id="sec-stats" role="button" tabindex="0" title="Ver estado de Simon">
+          <div class="stat"><canvas class="sic" id="si-h" width="7" height="7"></canvas><div class="hp"><div class="hpf" id="s-hambre"></div></div></div>
+          <div class="stat"><canvas class="sic" id="si-e" width="7" height="7"></canvas><div class="hp"><div class="hpf" id="s-energia"></div></div></div>
+          <div class="stat"><canvas class="sic" id="si-f" width="7" height="7"></canvas><div class="hp"><div class="hpf" id="s-feliz"></div></div></div>
+          <div class="stat"><canvas class="sic" id="si-l" width="7" height="7"></canvas><div class="hp"><div class="hpf" id="s-limp"></div></div></div>
+        </div>
+        <button class="chip-enf oculto" id="chip-enf" title="Simon tiene resfriado"><canvas id="ic-term" width="8" height="18"></canvas></button>
+      </div>
+      <div class="der2"><div class="chip" id="chip-mon"><canvas id="ic-mon" width="6" height="6"></canvas><span id="v-mon">0</span></div><button class="ibtn" id="b-noti"><canvas id="ic-not" width="11" height="11"></canvas><span class="nbadge oculto" id="nb-noti">0</span></button><button class="ibtn" id="b-ajustes"><canvas id="ic-aju" width="11" height="11"></canvas></button></div>
+    </div>
+  </header>
+
+  <main class="escena" id="escena">
+    <div id="adm-tag">ADMIN · NADA SE GUARDA</div>
+    <canvas id="sc" width="120" height="184"></canvas>
+    <div id="lugar-tag"><span id="ic-lugartag"></span><span id="lugar-tag-t">RECÁMARA</span></div>
+    <button class="flecha izq oculto" id="fl-izq"><canvas id="ic-fl-izq" width="8" height="11"></canvas><span id="tx-fl-izq"></span></button>
+    <button class="flecha der oculto" id="fl-der"><canvas id="ic-fl-der" width="8" height="11"></canvas><span id="tx-fl-der"></span></button>
+    <div id="fundido"></div>
+    <div id="hab-prev"><b id="hab-prev-nom"></b><span id="hab-prev-msg"></span></div>
+    <div id="esp-rep"><b>RECÁMARA ESPACIAL</b><span id="esp-rep-msg"></span><button class="bt ok gran" id="esp-rep-ok">REPARAR</button><button class="bt gran" id="esp-rep-x">VOLVER</button></div>
+    <div id="cg"><div id="cg-bar"><div id="cg-t"></div><button class="bt" id="cg-x">SALIR</button></div><div id="cg-h"><div id="cg-hb"></div></div><canvas id="cgc"></canvas><div id="cg-cx"><div id="cg-cx-bx"><div id="cg-cx-top"><canvas id="cg-cxp" width="52" height="56"></canvas><div id="cg-cxt"></div></div><button class="bt ok" id="cg-cxb">SIGUE ▶</button></div></div></div>
+    <div id="fanfare"><div class="fan-rayos"></div><div class="fan-flash"></div><div class="fan-item"><canvas id="fan-c"></canvas></div><div class="fan-t" id="fan-t"></div><div class="fan-d" id="fan-d"></div><div class="fan-ok" id="fan-ok">TOCA PARA CONTINUAR</div></div>
+    <div id="nombre"><div class="nom-box"><div class="nom-t" id="nom-t">¿COMO TE LLAMAS?</div><input id="nom-i" maxlength="10" autocomplete="off" spellcheck="false" placeholder="NOMBRE"><div class="nom-s" id="nom-s">HASTA 10 LETRAS</div><button class="bt ok gran" id="nom-ok" style="padding:12px 0">LISTO</button><button class="bt gran" id="nom-x" style="padding:10px 0;margin-top:8px;display:none">CANCELAR</button></div></div>
+    <div id="burbuja"></div>
+    <div class="lateral">
+      <button class="ibtn" id="b-foto" title="Foto"><canvas id="ic-cam" width="13" height="11"></canvas></button>
+      <button class="ibtn" id="b-vestir" title="Vestir"><canvas id="ic-ves" width="11" height="11"></canvas></button>
+      <button class="ibtn" id="b-editar" title="Editar habitación"><canvas id="ic-edi" width="11" height="11"></canvas></button>
+    </div>
+    <div class="tareas">
+      <button class="tarea oculto" id="t-mis"><canvas id="ic-mis" width="12" height="12"></canvas><span id="v-mis" style="display:none">MISIÓN</span><span class="pts"><b></b><b></b><b></b></span></button>
+      <button class="tarea oculto" id="t-bomba" title="Bomba"><canvas id="ic-bomba" width="13" height="14"></canvas><span id="v-bomba" class="th-cant">x0</span></button>
+      <button class="tarea oculto" id="t-cortex"><canvas id="ic-cortex" width="14" height="13"></canvas><span id="v-cortex"></span></button>
+      <div id="est-bts">
+      <button class="tarea oculto" id="t-basura"><canvas id="ic-bas" width="12" height="12"></canvas><span id="v-basura">TIRAR LIBROS</span></button>
+      <button class="tarea oculto" id="t-estudio"><canvas id="ic-est" width="12" height="12"></canvas><span id="v-estudio">ESTUDIAR</span></button>
+      </div>
+    </div>
+  </main>
+
+  <nav class="botones">
+    <button class="btn c-na" id="btn-comer"><canvas id="ib-comer" width="12" height="12"></canvas><span id="l-comer">Alimentar</span></button>
+    <button class="btn c-az" id="btn-dormir"><canvas id="ib-dormir" width="12" height="12"></canvas><span id="l-dormir">Dormir</span></button>
+    <button class="btn c-am" id="btn-tienda"><canvas id="ib-tienda" width="12" height="12"></canvas><span id="l-tienda">Tienda</span></button>
+    <button class="btn c-ro" id="btn-dice"><canvas id="ib-dice" width="12" height="12"></canvas><span id="l-dice">Simon dice</span></button>
+    <button class="btn c-ci" id="b-inv" aria-label="Inventario"><canvas id="ib-inv" width="12" height="12"></canvas><span id="l-inv">Inventario</span></button>
+  </nav>
+  <div id="ban"><div id="ban-t">1/4 PIOJOS</div><div id="ban-h"></div><div id="ban-b"><div id="ban-p"></div></div><button class="bt" id="ban-x">SALIR</button></div>
+  <div id="edicion"><div id="ed-grip"><span></span></div><button class="ibtn" id="ed-eye" aria-label="Ocultar menú"><canvas id="ic-eye" width="13" height="7"></canvas></button><div id="ed-capa-ctrl" class="off"><button class="ibtn" id="ed-atras" aria-label="Capa atrás">▼</button><span id="ed-ci">-</span><button class="ibtn" id="ed-adel" aria-label="Capa adelante">▲</button></div><button class="ibtn" id="ed-trash" aria-label="Quitar todo en esta habitación">🗑️</button><button class="sv" id="ed-x" aria-label="Guardar">✓</button><div id="ed-filtros" class="th-chips"></div><div class="buscar-wrap"><input id="ed-buscar" type="text" placeholder="BUSCAR MUEBLE..." autocomplete="off"><button id="ed-buscar-x" class="buscar-x" aria-label="Borrar búsqueda" style="display:none">✕</button></div><div id="ed-bd"></div>
+    <div id="ed-confirm"><div class="ed-confirm-bx"><p>¿Quitar TODO de esta habitación?<br>Muebles, pared y piso volverán a como estaban al inicio.<br>No se puede deshacer.</p><div class="ed-confirm-bt"><button class="bt" id="ed-conf-no">CANCELAR</button><button class="bt ok" id="ed-conf-si">SÍ, QUITAR TODO</button></div></div></div>
+  </div>
+  <button id="ed-ov-f" class="mu-f ov">⟲</button><button id="ed-ov-x" class="mu-x ov">✕</button>
+  <div id="planta-info"></div>
+<div id="est-top"><div class="el">DESCANSO</div><div class="et" id="est-top-t">05:00</div></div>
+  <div id="foco"><div class="fl" id="foco-l">ESTUDIANDO</div><div class="ft" id="foco-t">25:00</div><div class="fp" id="foco-p"></div><button class="fb oculto" id="foco-b"><canvas id="ic-bas2" width="12" height="12"></canvas></button><div class="fv min" id="foco-fv"><button class="ibtn fe" id="foco-e" aria-label="Ocultar controles"><canvas id="ic-eye2" width="13" height="7"></canvas></button><label>MÚSICA<input type="range" min="0" max="100" data-a="est_mus"></label><label id="fv-amb">AMBIENTE<input type="range" min="0" max="100" data-a="est_vol"></label></div><button class="fa oculto" id="foco-a">ADMIN: SALTAR AL DESCANSO</button><button class="fx" id="foco-x">TERMINAR</button></div>
+  <div id="toasts"></div>
+  <div id="flash"></div>
+  <div id="guia"></div>
+  <div id="dlg"><div id="dlg-box"><div id="dlg-n"></div><canvas id="dlg-p" width="76" height="80"></canvas><div id="dlg-t"></div><div id="dlg-f"></div><div id="dlg-op"></div></div></div>
+  <div id="mj"><div id="mj-box"><button id="mj-x" class="mini-btn">SALIR</button><div id="mj-hud"><span id="mj-pts">0</span><span id="mj-mon">$0</span><span id="mj-vid"></span></div><canvas id="mj-cv" width="96" height="176"></canvas>
+    <div id="mj-fin"><div class="mj-t">¡FIN!</div><div id="mj-res"></div><div class="mj-bt"><button class="bt ok" id="mj-otra">OTRA VEZ</button><button class="bt" id="mj-sal">SALIR</button></div></div></div></div>
+  <div id="run"><div id="run-box"><button id="run-x" class="mini-btn">SALIR</button><div id="run-hud"><span id="run-pts">0</span><span id="run-mon">$0</span></div><canvas id="run-cv" width="96" height="176"></canvas><div id="run-tip">TOCA PARA SALTAR<br>¡ESQUIVA LA BASURA!</div>
+    <div id="run-fin"><div class="mj-t">¡TROPEZÓ!</div><div id="run-res"></div><div class="mj-bt"><button class="bt ok" id="run-otra">OTRA VEZ</button><button class="bt" id="run-sal">SALIR</button></div></div></div></div>
+  <div id="rt"><div id="rt-box"><div id="rt-prog"></div><button id="rt-x" class="mini-btn">SALIR</button><div id="rt-hud"><span id="rt-pts">0</span><span id="rt-combo"></span></div><canvas id="rt-cv" width="96" height="176"></canvas><div id="rt-juez"></div>
+    <div id="rt-menu"><div class="mj-t">ELIGE TU CANCIÓN</div><div id="rt-canciones"></div><div class="mj-bt"><button class="bt" id="rt-menu-sal">SALIR</button></div></div>
+    <div id="rt-fin"><div class="mj-t">¡FIN DEL BAILE!</div><div id="rt-res"></div><div class="mj-bt"><button class="bt ok" id="rt-otra">OTRA VEZ</button><button class="bt" id="rt-sal">SALIR</button></div></div></div></div>
+  <div id="mem"><div id="mem-box"><div id="mem-top"><canvas id="mem-p" width="76" height="80"></canvas><div id="mem-cx"></div></div>
+    <div id="mem-hud"><span id="mem-r"></span><span id="mem-pts"></span><span id="mem-f"></span><button id="mem-x" class="mini-btn">SALIR</button></div><div id="mem-grid"></div>
+    <div id="mem-fin"><div class="mj-t">¡FIN DE LA PARTIDA!</div><div id="mem-res"></div><div class="mj-bt"><button class="bt ok" id="mem-otra">OTRA VEZ</button><button class="bt" id="mem-sal">SALIR</button></div></div></div></div>
+  <div class="modal" id="modal"><div class="ventana">
+    <div class="vt"><div class="vt-row"><div class="vt-l"><span id="m-titulo"></span><span id="vt-s1"></span></div><div class="vt-r"><span id="vt-s2"></span></div></div><button class="x" id="m-x" aria-label="Cerrar">X</button></div>
+    <button class="ibtn" id="vs-trash" aria-label="Quitar toda la ropa">🗑️</button>
+    <div id="vs-grip"><span></span></div>
+    <div class="vc" id="m-cuerpo"></div>
+  </div></div>
+</div>
+
+<script>
+window.addEventListener('error', function(e) {
+  console.error('[Simon Error]', e.error || e.message);
+  setTimeout(function() {
+    if (!window.__simon || !window.__simon.e) {
+      var r = document.getElementById('error-recovery');
+      if (!r) {
+        r = document.createElement('div');
+        r.id = 'error-recovery';
+        r.style.cssText = 'position:fixed;inset:0;background:rgba(15,18,48,0.96);color:#fff;z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:sans-serif;box-sizing:border-box;';
+        r.innerHTML = '<div style="font-size:24px;margin-bottom:10px">⚠️</div><h3 style="color:#ffd84a;margin:0 0 10px;font-size:16px">Simon no pudo iniciar</h3><p style="font-size:12px;color:#c0c8f0;line-height:1.6;margin:0 0 20px;max-width:280px">Hubo un problema al cargar los datos guardados o la caché del juego.</p><button id="btn-reparar" style="background:#4cd964;border:0;color:#0b1028;font-weight:bold;padding:12px 24px;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:10px">REPARAR Y REINICIAR</button><button id="btn-recargar" style="background:#3a47a8;border:0;color:#fff;padding:8px 16px;border-radius:6px;font-size:11px;cursor:pointer">REINTENTAR</button>';
+        document.body.appendChild(r);
+        document.getElementById('btn-reparar').onclick = function() {
+          try { localStorage.removeItem('simon-v1'); } catch(_) {}
+          try { localStorage.removeItem('simon-v1-bk'); } catch(_) {}
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(regs) {
+              var p = regs.map(function(reg) { return reg.unregister(); });
+              Promise.all(p).then(function() { location.reload(true); });
+            }).catch(function() { location.reload(true); });
+          } else {
+            location.reload(true);
+          }
+        };
+        document.getElementById('btn-recargar').onclick = function() { location.reload(true); };
+      }
+    }
+  }, 1500);
+});
+</script>
+
+<script charset="utf-8" src="js/nucleo/config.js"></script>
+<script charset="utf-8" src="js/nucleo/base.js"></script>
+<script charset="utf-8" src="js/nucleo/seguridad_guardado.js"></script>
+<script charset="utf-8" src="js/nucleo/respaldo_idb.js"></script>
+<script charset="utf-8" src="js/nucleo/sanitizar.js"></script>
+<script charset="utf-8" src="js/nucleo/estado_guardado.js"></script>
+<script charset="utf-8" src="js/nucleo/pixel_art.js"></script>
+<script charset="utf-8" src="js/simon/simon_sprite.js"></script>
+<script charset="utf-8" src="js/mundo/cuarto.js"></script>
+<script charset="utf-8" src="js/mundo/salas.js"></script>
+<script charset="utf-8" src="js/mundo/parque.js"></script>
+<script charset="utf-8" src="js/mundo/jardin_dibujo.js"></script>
+<script charset="utf-8" src="js/mundo/navegacion_mapa.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/base.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/dibujo_ropa.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/dibujo_muebles.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/items_base.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/jardin_plantas.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/cuadros.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/juguetes_pufs.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/decoracion_por_tema.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/estudio.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/temas_y_orden.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/paredes_pisos_refri.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/trofeos_camas_closet.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/ropa.js"></script>
+<script charset="utf-8" src="js/secretos/catalogo_secretos.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/previews.js"></script>
+<script charset="utf-8" src="js/economia/racha.js"></script>
+<script charset="utf-8" src="js/mundo/clima.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/comidas_y_efectos.js"></script>
+<script charset="utf-8" src="js/economia/mercado.js"></script>
+<script charset="utf-8" src="js/economia/jardin.js"></script>
+<script charset="utf-8" src="js/economia/refri.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/regalos_de_nivel.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/recamara_espacial.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/baratas.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/nuevos_v2_ropa.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/set_espacial.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/nuevos_v2_muebles.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/nuevos_v2_pisos_paredes.js"></script>
+<script charset="utf-8" src="js/economia/catalogo/platos_cocina.js"></script>
+<script charset="utf-8" src="js/historia/dialogos.js"></script>
+<script charset="utf-8" src="js/nucleo/notificaciones.js"></script>
+<script charset="utf-8" src="js/economia/codigos.js"></script>
+<script charset="utf-8" src="js/secretos/config_eastereggs.js"></script>
+<script charset="utf-8" src="js/minijuegos/00_config.js"></script>
+<script charset="utf-8" src="js/minijuegos/cocina.js"></script>
+<script charset="utf-8" src="js/minijuegos/bano.js"></script>
+<script charset="utf-8" src="js/personajes/cortex_bombas.js"></script>
+<script charset="utf-8" src="js/minijuegos/menu.js"></script>
+<script charset="utf-8" src="js/minijuegos/atrapa_keke.js"></script>
+<script charset="utf-8" src="js/minijuegos/ritmo.js"></script>
+<script charset="utf-8" src="js/minijuegos/corre_simon.js"></script>
+<script charset="utf-8" src="js/minijuegos/memoria.js"></script>
+<script charset="utf-8" src="js/mundo/sprite_cache.js"></script>
+<script charset="utf-8" src="js/mundo/escena_estado.js"></script>
+<script charset="utf-8" src="js/mundo/gestos.js"></script>
+<script charset="utf-8" src="js/mundo/colocar_muebles.js"></script>
+<script charset="utf-8" src="js/mundo/paredes_libres.js"></script>
+<script charset="utf-8" src="js/mundo/juguetes_zona_guia.js"></script>
+<script charset="utf-8" src="js/mundo/dibujar_muebles.js"></script>
+<script charset="utf-8" src="js/mundo/luces_muebles.js"></script>
+<script charset="utf-8" src="js/mundo/juguetes_fisica.js"></script>
+<script charset="utf-8" src="js/secretos/sif.js"></script>
+<script charset="utf-8" src="js/nucleo/bucle_y_dibujo.js"></script>
+<script charset="utf-8" src="js/audio/audio_base.js"></script>
+<script charset="utf-8" src="js/interfaz/hablar_y_pintar.js"></script>
+<script charset="utf-8" src="js/interfaz/sistema_eventos.js"></script>
+<script charset="utf-8" src="js/economia/economia_logros.js"></script>
+<script charset="utf-8" src="js/simon/vida_propia.js"></script>
+<script charset="utf-8" src="js/personajes/cortex_visitas.js"></script>
+<script charset="utf-8" src="js/historia/historia_intro.js"></script>
+<script charset="utf-8" src="js/secretos/00_base_cielo.js"></script>
+<script charset="utf-8" src="js/secretos/01_luna_dorada.js"></script>
+<script charset="utf-8" src="js/secretos/02_estrella_fugaz.js"></script>
+<script charset="utf-8" src="js/secretos/03_cuadro_cortex_bebe.js"></script>
+<script charset="utf-8" src="js/secretos/04_peluche_cortex.js"></script>
+<script charset="utf-8" src="js/secretos/05_gorro_chef.js"></script>
+<script charset="utf-8" src="js/secretos/06_luna_sangre.js"></script>
+<script charset="utf-8" src="js/secretos/07_luna_azul.js"></script>
+<script charset="utf-8" src="js/secretos/08_aura_trueno.js"></script>
+<script charset="utf-8" src="js/secretos/09_alvarikoke.js"></script>
+<script charset="utf-8" src="js/secretos/10_chica_sol.js"></script>
+<script charset="utf-8" src="js/personajes/tutorial_pantalla.js"></script>
+<script charset="utf-8" src="js/personajes/cortex_caja.js"></script>
+<script charset="utf-8" src="js/personajes/cortex_siesta.js"></script>
+<script charset="utf-8" src="js/personajes/cortex_comerciante.js"></script>
+<script charset="utf-8" src="js/audio/musica.js"></script>
+<script charset="utf-8" src="js/audio/lluvia.js"></script>
+<script charset="utf-8" src="js/audio/ambiente_estudio.js"></script>
+<script charset="utf-8" src="js/audio/ambiente_lugar.js"></script>
+<script charset="utf-8" src="js/audio/botones_audio.js"></script>
+<script charset="utf-8" src="js/audio/foto.js"></script>
+<script charset="utf-8" src="js/economia/regalo_diario.js"></script>
+<script charset="utf-8" src="js/economia/tienda_equipar.js"></script>
+<script charset="utf-8" src="js/economia/misiones_preguntas.js"></script>
+<script charset="utf-8" src="js/economia/adivinar_silueta.js"></script>
+<script charset="utf-8" src="js/economia/misiones_ventana.js"></script>
+<script charset="utf-8" src="js/economia/simon_dice_ventana.js"></script>
+<script charset="utf-8" src="js/economia/respaldo_codigos.js"></script>
+<script charset="utf-8" src="js/economia/ajustes_boton.js"></script>
+<script charset="utf-8" src="js/economia/admin_acceso.js"></script>
+<script charset="utf-8" src="js/economia/ajustes_ventana.js"></script>
+<script charset="utf-8" src="js/economia/admin_panel.js"></script>
+<script charset="utf-8" src="js/economia/comida_especial.js"></script>
+<script charset="utf-8" src="js/mundo/editor_lista.js"></script>
+<script charset="utf-8" src="js/mundo/editor_modo.js"></script>
+<script charset="utf-8" src="js/mundo/iconos_vestir_editar_inv.js"></script>
+<script charset="utf-8" src="js/mundo/vestir_acciones.js"></script>
+<script charset="utf-8" src="js/mundo/ficha_simon.js"></script>
+<script charset="utf-8" src="js/mundo/vestir_ventana.js"></script>
+<script charset="utf-8" src="js/mundo/inventario_ventana.js"></script>
+<script charset="utf-8" src="js/simon/resfriado.js"></script>
+<script charset="utf-8" src="js/simon/reacciones_ropa_tormenta.js"></script>
+<script charset="utf-8" src="js/simon/mimos.js"></script>
+<script charset="utf-8" src="js/interfaz/navegacion_atras.js"></script>
+<script charset="utf-8" src="js/interfaz/ventana_base.js"></script>
+<script charset="utf-8" src="js/interfaz/tienda_ventana.js"></script>
+<script charset="utf-8" src="js/interfaz/clics_ventana.js"></script>
+<script charset="utf-8" src="js/interfaz/acciones_comer_jugar_dormir.js"></script>
+<script charset="utf-8" src="js/interfaz/botones_principales.js"></script>
+<script charset="utf-8" src="js/interfaz/toques_escena.js"></script>
+<script charset="utf-8" src="js/interfaz/audio_destrabar.js"></script>
+<script charset="utf-8" src="js/interfaz/bucle_y_vuelta.js"></script>
+<script charset="utf-8" src="js/mundo/estudio.js"></script>
+<script charset="utf-8" src="js/nucleo/arranque.js"></script>
+</body>
+</html>
